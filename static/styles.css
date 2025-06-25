@@ -1,0 +1,60 @@
+.branding {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  display: flex;
+  align-items: center;
+  z-index: 10;
+}
+
+.branding img {
+  width: 40px;
+  height: 40px;
+  margin-right: 10px;
+}
+
+.branding-text .title {
+  font-weight: bold;
+  font-size: 18px;
+  color: #333;
+}
+
+.branding-text .subtitle {
+  font-size: 12px;
+  color: #666;
+  margin-top: -2px; /* sedikit naik biar rapih */
+}
+.download-button-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+.details {
+  margin-top: 20px;
+  background: #f0f8ff;
+  padding: 15px;
+  border-radius: 10px;
+  font-size: 14px;
+  width: 100%;
+  box-sizing: border-box;
+  text-align: left;
+}
+.details ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+.details li {
+  margin-bottom: 10px;
+}
+#snow-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none; /* biar gak ganggu klik */
+  z-index: -1; /* di belakang semua konten */
+  overflow: hidden;
+}

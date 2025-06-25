@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <title>SYMJY - Segmentasi K-Means</title>
+    <link rel="icon" href="{{ url_for('static', filename='fiagfi.png') }}" />
+    <link rel="stylesheet" href="/static/styles.css" />
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: #ffffff;
+        overflow-x: hidden;
+        font-family: Arial, sans-serif;
+      }
+
+      .branding {
+        display: flex;
+        align-items: center;
+        padding: 10px 20px;
+      }
+
+      .branding img {
+        height: 40px;
+        margin-right: 10px;
+      }
+
+      .branding-text .title {
+        font-weight: bold;
+        font-size: 20px;
+      }
+
+      .branding-text .subtitle {
+        font-size: 12px;
+        color: #555;
+      }
+
+      .container {
+        max-width: 900px;
+        margin: auto;
+        padding: 20px;
+      }
+
+      h1 {
+        text-align: center;
+      }
+
+      form {
+        text-align: center;
+        margin-top: 20px;
+      }
+
+      input[type="file"] {
+        margin-bottom: 10px;
+      }
+
+      button {
+        background-color: #008cba;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        margin-top: 10px;
+        cursor: pointer;
+      }
+
+      .canvas-section {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: flex-start;
+        gap: 20px;
+      }
+
+      .preview-card {
+        background: #f9f9f9;
+        border-radius: 10px;
+        padding: 15px;
+        width: 100%;
+        max-width: 420px;
+        box-sizing: border-box;
+        text-align: center;
+        flex: 1 1 300px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 320px;
+        transition: min-height 0.3s ease;
+      }
+
+      .preview-card h4 {
+        margin-bottom: 10px;
+        font-weight: bold;
+      }
+
+      .preview-card img {
+        width: auto;
+        max-width: 100%;
+        height: auto;
+        max-height: 500px;
+        object-fit: contain;
+        border: 2px solid #ccc;
+        padding: 10px;
+        background-color: #f8f8f8;
+        border-radius: 20px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+
+      .download-button-wrapper {
+        margin-top: 15px;
+        text-align: center;
+        width: 100%;
+      }
+
+      .download-button-wrapper button {
+        background-color: #008cba;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      .details-wide {
+        margin: 40px auto 0;
+        background: #f0f8ff;
+        padding: 20px;
+        border-radius: 12px;
+        font-size: 18px;
+        width: 100%;
+        max-width: 800px;
+        box-sizing: border-box;
+        text-align: left;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      }
+
+      .details-wide ul {
+        list-style: none;
+        padding-left: 0;
+        margin: 0;
+      }
+
+      .details-wide li {
+        margin-bottom: 8px;
+      }
+
+      .snowflake {
+        position: absolute;
+        top: -10px;
+        background: #128fc5;
+        border-radius: 50%;
+        opacity: 0.8;
+        animation-name: fall;
+        animation-timing-function: linear;
+        animation-iteration-count: 1;
+      }
+
+      @keyframes fall {
+        0% {
+          transform: translateY(0);
+          opacity: 0.8;
+        }
+        100% {
+          transform: translateY(110vh);
+          opacity: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="snow-container"></div>
+
+    <!-- Branding Header -->
+    <div class="branding">
+      <img src="{{ url_for('static', filename='fiagfi.png') }}" alt="Logo" />
+      <div class="branding-text">
+        <div class="title">SYMJY</div>
+        <div class="subtitle">Segmentation Using K-Means Just for You</div>
+      </div>
+    </div>
+
+    <div class="container">
+      <h1>SEGMENTASI K-MEANS</h1>
+
+      <!-- Form Upload -->
+      <form method="POST" enctype="multipart/form-data">
+        <input type="file" name="image" id="imageInput" required />
+        <br />
+        <button type="submit">Segmentasi Image</button>
+      </form>
+
+      <!-- Preview Section -->
+      <div class="canvas-section">
+        <!-- Gambar Asli -->
+        <div class="preview-card">
+          <h4>Original Image Preview</h4>
+          <img
+            id="originalPreview"
+            src="{% if original %}{{ url_for('static', filename='uploads/' + original) }}{% else %}{{ url_for('static', filename='noimage.png') }}{% endif %}"
+            alt="Original Image"
+          />
+        </div>
+
+        <!-- Gambar Segmentasi -->
+        <div class="preview-card">
+          <h4>Segmented Image Preview</h4>
+          {% if segmented %}
+          <img
+            src="{{ url_for('static', filename='uploads/' + segmented) }}"
+            alt="Segmented Image"
+          />
+          <div class="download-button-wrapper">
+            <a href="{{ url_for('download', filename=segmented) }}">
+              <button>Download Image</button>
+            </a>
+          </div>
+          {% else %}
+          <img
+            src="{{ url_for('static', filename='noimage.png') }}"
+            alt="Waiting for segmentation..."
+          />
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Detail Gambar di bawah -->
+      {% if details %}
+      <div class="details-wide">
+        <h4><u>Image details</u></h4>
+        <ul>
+          <li><strong>Jumlah Klaster (K):</strong> {{ details.k }}</li>
+          <li><strong>Ukuran Citra Asli:</strong> {{ details.size }}</li>
+          <li><strong>Format Citra Hasil:</strong> {{ details.format }}</li>
+          <li><strong>Waktu Proses Segmentasi:</strong> {{ details.time }}</li>
+          <li>
+            <strong>Dominasi Warna Tiap Klaster:</strong>
+            <ul>
+              {% for color in details.colors %}
+              <li>
+                • Klaster {{ color.klaster }}:
+                <span style="color:{{ color.warna }}">{{ color.warna }}</span>
+                ({{ color.nama }}) – {{ color.persentase }}
+              </li>
+              {% endfor %}
+            </ul>
+          </li>
+        </ul>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Efek Salju -->
+    <script>
+      function createSnowflake() {
+        const snowflake = document.createElement("div");
+        snowflake.className = "snowflake";
+        snowflake.style.left = Math.random() * 100 + "vw";
+        const size = Math.random() * 4 + 2;
+        snowflake.style.width = size + "px";
+        snowflake.style.height = size + "px";
+        const duration = Math.random() * 5 + 5;
+        snowflake.style.animationDuration = duration + "s";
+        setTimeout(() => snowflake.remove(), duration * 1000);
+        document.getElementById("snow-container").appendChild(snowflake);
+      }
+      setInterval(createSnowflake, 100);
+    </script>
+
+    <!-- Preview Gambar Dinamis -->
+    <script>
+      document
+        .getElementById("imageInput")
+        .addEventListener("change", function (e) {
+          const file = e.target.files[0];
+          const preview = document.getElementById("originalPreview");
+          const card = preview.closest(".preview-card");
+
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = function (evt) {
+              preview.src = evt.target.result;
+
+              preview.onload = function () {
+                card.style.height = "auto";
+              };
+            };
+            reader.readAsDataURL(file);
+          } else {
+            preview.src = "{{ url_for('static', filename='noimage.png') }}";
+            card.style.height = "320px";
+          }
+        });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,17 @@
+# Python cache
+__pycache__/
+*.pyc
+
+# Virtual env (walau belum dipakai)
+venv/
+env/
+
+# File konfigurasi (kalau pakai nanti)
+.env
+
+# File sementara hasil upload
+static/uploads/
+
+# File sistem OS
+.DS_Store
+Thumbs.db
