@@ -1,6 +1,13 @@
 # Python cache
 __pycache__/
 *.pyc
+.env
+*.jpg
+*.png
+*.jpeg
+*.gif
+*.zip
+*.db
 
 # Virtual env (walau belum dipakai)
 venv/

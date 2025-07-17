@@ -10,6 +10,8 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    count = len([name for name in os.listdir(UPLOAD_FOLDER) if os.path.isfile(os.path.join(UPLOAD_FOLDER, name))])
+    
     if request.method == 'POST':
         img = request.files['image']
         if img:
@@ -18,14 +20,20 @@ def index():
             input_path = os.path.join(UPLOAD_FOLDER, filename)
             img.save(input_path)
 
-            output_path, details = segment_image(input_path, k=3)
+            output_path, details, steps = segment_image(input_path, k=3)
+            count += 1
 
             return render_template('SYMJY.html',
                        original=filename,
                        segmented=os.path.basename(output_path),
-                       details=details)
+                       details=details,
+                       steps=steps,
+                       count=count)
 
-    return render_template('SYMJY.html')
+
+    return render_template('SYMJY.html', count=count)
+
+
 
 @app.route('/download/<filename>')
 def download(filename):
